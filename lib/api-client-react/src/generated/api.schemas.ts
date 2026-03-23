@@ -8,3 +8,68 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type CreateCandidateGender =
+  (typeof CreateCandidateGender)[keyof typeof CreateCandidateGender];
+
+export const CreateCandidateGender = {
+  Male: "Male",
+  Female: "Female",
+  Other: "Other",
+  Prefer_not_to_say: "Prefer not to say",
+} as const;
+
+export interface CreateCandidate {
+  /** @minLength 1 */
+  firstName: string;
+  /** @minLength 1 */
+  lastName: string;
+  gender: CreateCandidateGender;
+  /** Date of birth in YYYY-MM-DD format */
+  dateOfBirth: string;
+  email: string;
+  /** @minLength 1 */
+  phoneNumber: string;
+  /** @minLength 1 */
+  courseOfStudy: string;
+  /**
+   * @minimum 0
+   * @maximum 100
+   */
+  percentageScored: number;
+  /** @minLength 1 */
+  nameOfCollege: string;
+  hasBacklog: boolean;
+}
+
+export type CandidateGender =
+  (typeof CandidateGender)[keyof typeof CandidateGender];
+
+export const CandidateGender = {
+  Male: "Male",
+  Female: "Female",
+  Other: "Other",
+  Prefer_not_to_say: "Prefer not to say",
+} as const;
+
+export interface Candidate {
+  id: number;
+  firstName: string;
+  lastName: string;
+  gender: CandidateGender;
+  dateOfBirth: string;
+  email: string;
+  phoneNumber: string;
+  courseOfStudy: string;
+  percentageScored: number;
+  nameOfCollege: string;
+  hasBacklog: boolean;
+  createdAt: string;
+}
+
+export type ErrorResponseDetails = { [key: string]: unknown };
+
+export interface ErrorResponse {
+  error: string;
+  details?: ErrorResponseDetails;
+}

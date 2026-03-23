@@ -6,4 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./candidate";
+export * from "./candidateGender";
+export * from "./createCandidate";
+export * from "./createCandidateGender";
+export * from "./errorResponse";
+export * from "./errorResponseDetails";
 export * from "./healthStatus";

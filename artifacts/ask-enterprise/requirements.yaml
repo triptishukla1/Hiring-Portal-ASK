@@ -1,0 +1,16 @@
+packages:
+  "framer-motion": "For smooth entry animations and premium interaction feel"
+  "react-hook-form": "For complex form state management and performance"
+  "@hookform/resolvers": "To integrate Zod validation with react-hook-form"
+  "zod": "For strict schema validation on the frontend before submission"
+
+images:
+  - path: "artifacts/ask-enterprise/public/images/ask-logo.png"
+    description: "A professional, minimalist, and modern corporate logo for 'ASK Enterprise'. The logo should use deep trust-building blues and crisp whites. Simple geometric shapes, clean typography feel. Transparent background."
+    aspect_ratio: "16:9"
+
+notes:
+  - "Assuming standard usage of Tailwind CSS v4"
+  - "Will use generated @workspace/api-client-react hooks for API interaction"
+  - "Transforming 3-part DOB (Month, Day, Year) into the YYYY-MM-DD string format expected by the API"
+  - "Transforming string Yes/No for backlog into boolean"

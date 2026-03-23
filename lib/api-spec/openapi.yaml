@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: candidates
+    description: Candidate management operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,69 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /candidates:
+    get:
+      operationId: listCandidates
+      tags: [candidates]
+      summary: List all candidates
+      description: Returns a list of all candidate submissions
+      responses:
+        "200":
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Candidate"
+    post:
+      operationId: createCandidate
+      tags: [candidates]
+      summary: Submit candidate data sheet
+      description: Submit a new candidate application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCandidate"
+      responses:
+        "201":
+          description: Candidate created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /candidates/{id}:
+    get:
+      operationId: getCandidate
+      tags: [candidates]
+      summary: Get a candidate by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Candidate details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+        "404":
+          description: Candidate not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +98,97 @@ components:
           type: string
       required:
         - status
-
+    CreateCandidate:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        gender:
+          type: string
+          enum: [Male, Female, Other, Prefer not to say]
+        dateOfBirth:
+          type: string
+          description: Date of birth in YYYY-MM-DD format
+        email:
+          type: string
+          format: email
+        phoneNumber:
+          type: string
+          minLength: 1
+        courseOfStudy:
+          type: string
+          minLength: 1
+        percentageScored:
+          type: number
+          minimum: 0
+          maximum: 100
+        nameOfCollege:
+          type: string
+          minLength: 1
+        hasBacklog:
+          type: boolean
+      required:
+        - firstName
+        - lastName
+        - gender
+        - dateOfBirth
+        - email
+        - phoneNumber
+        - courseOfStudy
+        - percentageScored
+        - nameOfCollege
+        - hasBacklog
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        gender:
+          type: string
+          enum: [Male, Female, Other, Prefer not to say]
+        dateOfBirth:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        courseOfStudy:
+          type: string
+        percentageScored:
+          type: number
+        nameOfCollege:
+          type: string
+        hasBacklog:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - firstName
+        - lastName
+        - gender
+        - dateOfBirth
+        - email
+        - phoneNumber
+        - courseOfStudy
+        - percentageScored
+        - nameOfCollege
+        - hasBacklog
+        - createdAt
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        details:
+          type: object
+      required:
+        - error

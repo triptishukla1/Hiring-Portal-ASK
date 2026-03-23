@@ -5,18 +5,26 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  Candidate,
+  CreateCandidate,
+  ErrorResponse,
+  HealthStatus,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +100,256 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Returns a list of all candidate submissions
+ * @summary List all candidates
+ */
+export const getListCandidatesUrl = () => {
+  return `/api/candidates`;
+};
+
+export const listCandidates = async (
+  options?: RequestInit,
+): Promise<Candidate[]> => {
+  return customFetch<Candidate[]>(getListCandidatesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListCandidatesQueryKey = () => {
+  return [`/api/candidates`] as const;
+};
+
+export const getListCandidatesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCandidates>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listCandidates>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListCandidatesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listCandidates>>> = ({
+    signal,
+  }) => listCandidates({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCandidates>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListCandidatesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCandidates>>
+>;
+export type ListCandidatesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all candidates
+ */
+
+export function useListCandidates<
+  TData = Awaited<ReturnType<typeof listCandidates>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listCandidates>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListCandidatesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Submit a new candidate application
+ * @summary Submit candidate data sheet
+ */
+export const getCreateCandidateUrl = () => {
+  return `/api/candidates`;
+};
+
+export const createCandidate = async (
+  createCandidate: CreateCandidate,
+  options?: RequestInit,
+): Promise<Candidate> => {
+  return customFetch<Candidate>(getCreateCandidateUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createCandidate),
+  });
+};
+
+export const getCreateCandidateMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createCandidate>>,
+    TError,
+    { data: BodyType<CreateCandidate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createCandidate>>,
+  TError,
+  { data: BodyType<CreateCandidate> },
+  TContext
+> => {
+  const mutationKey = ["createCandidate"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createCandidate>>,
+    { data: BodyType<CreateCandidate> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createCandidate(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateCandidateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createCandidate>>
+>;
+export type CreateCandidateMutationBody = BodyType<CreateCandidate>;
+export type CreateCandidateMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit candidate data sheet
+ */
+export const useCreateCandidate = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createCandidate>>,
+    TError,
+    { data: BodyType<CreateCandidate> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createCandidate>>,
+  TError,
+  { data: BodyType<CreateCandidate> },
+  TContext
+> => {
+  return useMutation(getCreateCandidateMutationOptions(options));
+};
+
+/**
+ * @summary Get a candidate by ID
+ */
+export const getGetCandidateUrl = (id: number) => {
+  return `/api/candidates/${id}`;
+};
+
+export const getCandidate = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Candidate> => {
+  return customFetch<Candidate>(getGetCandidateUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCandidateQueryKey = (id: number) => {
+  return [`/api/candidates/${id}`] as const;
+};
+
+export const getGetCandidateQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCandidate>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getCandidate>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCandidateQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCandidate>>> = ({
+    signal,
+  }) => getCandidate(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCandidate>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCandidateQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCandidate>>
+>;
+export type GetCandidateQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get a candidate by ID
+ */
+
+export function useGetCandidate<
+  TData = Awaited<ReturnType<typeof getCandidate>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getCandidate>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCandidateQueryOptions(id, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

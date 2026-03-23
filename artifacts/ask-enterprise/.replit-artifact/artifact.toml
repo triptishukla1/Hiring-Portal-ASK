@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ASK Enterprise - Hiring Platform"
+version = "1.0.0"
+id = "artifacts/ask-enterprise"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26232
+
+[services.development]
+run = "pnpm --filter @workspace/ask-enterprise run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ask-enterprise", "run", "build" ]
+publicDir = "artifacts/ask-enterprise/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26232"
+BASE_PATH = "/"

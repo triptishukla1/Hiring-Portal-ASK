@@ -14,3 +14,69 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Returns a list of all candidate submissions
+ * @summary List all candidates
+ */
+export const ListCandidatesResponseItem = zod.object({
+  id: zod.number(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  gender: zod.enum(["Male", "Female", "Other", "Prefer not to say"]),
+  dateOfBirth: zod.string(),
+  email: zod.string(),
+  phoneNumber: zod.string(),
+  courseOfStudy: zod.string(),
+  percentageScored: zod.number(),
+  nameOfCollege: zod.string(),
+  hasBacklog: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListCandidatesResponse = zod.array(ListCandidatesResponseItem);
+
+/**
+ * Submit a new candidate application
+ * @summary Submit candidate data sheet
+ */
+
+export const createCandidateBodyPercentageScoredMin = 0;
+export const createCandidateBodyPercentageScoredMax = 100;
+
+export const CreateCandidateBody = zod.object({
+  firstName: zod.string().min(1),
+  lastName: zod.string().min(1),
+  gender: zod.enum(["Male", "Female", "Other", "Prefer not to say"]),
+  dateOfBirth: zod.string().describe("Date of birth in YYYY-MM-DD format"),
+  email: zod.string().email(),
+  phoneNumber: zod.string().min(1),
+  courseOfStudy: zod.string().min(1),
+  percentageScored: zod
+    .number()
+    .min(createCandidateBodyPercentageScoredMin)
+    .max(createCandidateBodyPercentageScoredMax),
+  nameOfCollege: zod.string().min(1),
+  hasBacklog: zod.boolean(),
+});
+
+/**
+ * @summary Get a candidate by ID
+ */
+export const GetCandidateParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetCandidateResponse = zod.object({
+  id: zod.number(),
+  firstName: zod.string(),
+  lastName: zod.string(),
+  gender: zod.enum(["Male", "Female", "Other", "Prefer not to say"]),
+  dateOfBirth: zod.string(),
+  email: zod.string(),
+  phoneNumber: zod.string(),
+  courseOfStudy: zod.string(),
+  percentageScored: zod.number(),
+  nameOfCollege: zod.string(),
+  hasBacklog: zod.boolean(),
+  createdAt: zod.string(),
+});
