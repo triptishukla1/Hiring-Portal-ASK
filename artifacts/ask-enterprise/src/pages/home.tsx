@@ -1,5 +1,6 @@
 import { CandidateForm } from "@/components/candidate-form";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 
 export default function Home() {
   return (
@@ -24,6 +25,11 @@ export default function Home() {
             </span>
           </div>
           <div className="flex items-center gap-4">
+            <Link href="/">
+              <span className="text-sm font-medium text-gray-500 hover:text-primary transition-colors cursor-pointer hidden md:block">
+                ← Back to Home
+              </span>
+            </Link>
             <div className="text-sm font-medium text-gray-500 hidden md:block">
               Need help? <a href="#" className="text-primary hover:underline">Contact Support</a>
             </div>
